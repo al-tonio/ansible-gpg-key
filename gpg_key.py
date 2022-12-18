@@ -867,7 +867,19 @@ class GpgKey(object):
         prepare content
         """
         # create temporary file and write contents
-        filename = "tmp-gpg-{}.asc".format(time.time())
+        # filename = "tmp-gpg-{}.asc".format(time.time())
+        # Create file in /tmp and not in the current default /var/tmp/ansible-tmp-xxx directory so that
+        # when we run as non-privileged become_user, we can still write/read the file contents
+        # OK for me since there are no potentially adverserial users on my servers
+        # Typical case:
+        #   - name: Install the gpg for user gitolite3
+        #     become: True
+        #     become_user: gitolite3
+        #     gpg_key:
+        #       content:  "{{ lookup('file', 'files/ABCDEFG.gpg') }}"
+        #       trust: '5'
+        #       homedir: /var/lib/gitolite3/.gnupg 
+        filename = "/tmp/tmp-gpg-{}.asc".format(time.time())
         self._vv("writing content to temporary file [{}]".format(filename))
         tmpfile = open("{}".format(filename),"w+")
         tmpfile.write(content)
@@ -933,6 +945,7 @@ class GpgKey(object):
         # file present
         if action == "file" and state == "present":
             args = [
+                "--batch", # do not fail if passphrase required for private key, cf https://dev.gnupg.org/T2313
                 "--import",
                 self.module.params["file"],
             ]
