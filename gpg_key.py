@@ -2,6 +2,7 @@
 
 # Copyright: (c) 2019, Rinck H. Sonnenberg - Netson <r.sonnenberg@netson.nl>
 # License: MIT
+# See https://github.com/netson/ansible-gpg-key
 
 ANSIBLE_METADATA = {
     'metadata_version': '1.1',
